@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: [8, 'Password should be at least 8 characters'],
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -49,6 +50,10 @@ userSchema.pre('save', async function (next) {
 
   next()
 })
+
+// INSTANCE METHOD (available for all user documents)
+userSchema.methods.verifyPassword = async (inputPassword, realPassword) =>
+  await bcrypt.compare(inputPassword, realPassword)
 
 const User = mongoose.model('User', userSchema)
 
