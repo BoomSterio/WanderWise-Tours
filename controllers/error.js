@@ -1,6 +1,6 @@
 const AppError = require('../utils/app-error')
 
-const handleDBErrors = (err) => {
+const handleReadableErrors = (err) => {
   if (err.name === 'CastError') {
     const message = `Invalid ${err.path}: ${err.value}`
     return new AppError(400, message)
@@ -16,6 +16,14 @@ const handleDBErrors = (err) => {
     const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0]
     const message = `Duplicate value: ${value}. Please use another value!`
     return new AppError(400, message)
+  }
+
+  if (err.name === 'JsonWebTokenError') {
+    return new AppError(401, 'Invalid token. Please log in again!')
+  }
+
+  if (err.name === 'TokenExpiredError') {
+    return new AppError(401, 'Expired token. Please log in again!')
   }
 
   return err
@@ -51,7 +59,7 @@ const sendErrProd = (err, res) => {
 }
 
 module.exports = (err, req, res, next) => {
-  const error = handleDBErrors(err)
+  const error = handleReadableErrors(err)
 
   error.statusCode = error.statusCode || 500
   error.status = error.status || 'error'
