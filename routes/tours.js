@@ -1,6 +1,8 @@
 const express = require('express')
 
-const {protect} = require('../controllers/auth')
+const { USER_ROLES } = require('../constants/user')
+
+const { protect, restrictTo } = require('../controllers/auth')
 const {
   getAllTours,
   createTour,
@@ -19,6 +21,10 @@ router.route('/stats').get(getTourStats)
 router.route('/monthly-plan/:year').get(getMonthlyPlan)
 
 router.route('/').get(protect, getAllTours).post(createTour)
-router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour)
+router
+  .route('/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.LEAD_GUIDE, USER_ROLES.TECHNICIAN), deleteTour)
 
 module.exports = router

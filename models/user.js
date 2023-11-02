@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
+
+const { USER_ROLES } = require('../constants/user')
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,6 +20,11 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, 'Invalid email address'],
   },
   image: String,
+  role: {
+    type: String,
+    enum: Object.values(USER_ROLES),
+    default: USER_ROLES.USER,
+  },
   password: {
     type: String,
     required: [true, 'Please provide a password'],
@@ -35,6 +43,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 })
 
 // Password encryption happens between retrieving the request and saving it to the db
@@ -64,6 +74,16 @@ userSchema.methods.hasChangedPasswordAfter = function (JWTTimestamp) {
 
   // False means NOT changed
   return false
+}
+
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex')
+
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000
+
+  return resetToken
 }
 
 const User = mongoose.model('User', userSchema)
