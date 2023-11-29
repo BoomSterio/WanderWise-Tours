@@ -1,5 +1,6 @@
 const { promisify } = require('util')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 const User = require('../models/user')
 const catchAsync = require('../utils/catch-async')
@@ -9,19 +10,23 @@ const sendEmail = require('./email')
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN })
 
-exports.signup = catchAsync(async (req, res, next) => {
-  const { name, email, role, password, passwordConfirm } = req.body
-  const user = await User.create({ name, email, role, password, passwordConfirm })
-
+const createAndSendToken = (user, statusCode, res) => {
   const token = signToken(user._id)
 
-  res.status(201).json({
+  res.status(statusCode).json({
     status: 'success',
     token,
     data: {
       user,
     },
   })
+}
+
+exports.signup = catchAsync(async (req, res, next) => {
+  const { name, email, role, password, passwordConfirm } = req.body
+  const user = await User.create({ name, email, role, password, passwordConfirm })
+
+  createAndSendToken(user, 201, res)
 })
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -41,15 +46,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything ok, send token to client
-  const token = signToken(user._id)
-
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      user,
-    },
-  })
+  createAndSendToken(user, 200, res)
 })
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -134,6 +131,46 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 })
 
-exports.resetPassword = (req, res, next) => {
+exports.resetPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on the token
-}
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex')
+
+  const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: Date.now() } })
+
+  // 2) Set the new password if token has not expired and user exists
+  if (!user) {
+    return next(new AppError(400, 'Token is invalid or has expired'))
+  }
+
+  user.password = req.body.password
+  user.passwordConfirm = req.body.passwordConfirm
+  user.passwordResetToken = undefined
+  user.passwordResetExpires = undefined
+
+  await user.save()
+
+  // 3) Update passwordChangedAt for the user
+
+  // 4) Log the user in (send JWT)
+  createAndSendToken(user, 200, res)
+})
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // 1) Get user from the collection
+  const user = await User.findById(req.user.id).select('+password')
+
+  // 2) Check if posted password is correct
+  const isPasswordCorrect = await user.verifyPassword(req.body.passwordCurrent, user.password)
+  if (!isPasswordCorrect) {
+    return next(new AppError(401, `Password you provided doesn't match with the current one.`))
+  }
+
+  // 3) Update password
+  user.password = req.body.password
+  user.passwordConfirm = req.body.passwordConfirm
+  await user.save()
+  // User.findByIdAndUpdate would NOT trigger middlewares and passwordConfirm validator! That's why we use .save()
+
+  // 4) Log user in (send JWT)
+  createAndSendToken(user, 200, res)
+})

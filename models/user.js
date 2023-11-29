@@ -62,7 +62,17 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-// INSTANCE METHOD (available for all user documents)
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) {
+    return next()
+  }
+
+  // Subsctracting 1 second to ensure the JWT is always created after the password has been changed
+  this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
+// INSTANCE METHOD (available for all user documents: user.verifypassword(...options))
 userSchema.methods.verifyPassword = async (inputPassword, realPassword) =>
   await bcrypt.compare(inputPassword, realPassword)
 
