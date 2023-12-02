@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const rateLimit = require('express-rate-limit')
 
 const AppError = require('./utils/app-error')
 
@@ -9,11 +10,21 @@ const usersRouter = require('./routes/users')
 
 const app = express()
 
-// 1) Middlewares
+const RATE_LIMIT_MINUTES = 60
+
+// 1) Global Middlewares
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'))
 }
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: RATE_LIMIT_MINUTES * 60 * 1000,
+  message: `Too many requests from this IP. Please try again after ${RATE_LIMIT_MINUTES} minutes`,
+})
+app.use('/api', limiter)
+
 app.use(express.json())
 app.use(express.static(`${__dirname}/public`))
 
