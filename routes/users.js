@@ -1,7 +1,16 @@
 const express = require('express')
 
 const { getAllUsers, createUser, getUser, updateUser, deleteUser, updateMe, deleteMe } = require('../controllers/user')
-const { signup, login, forgotPassword, resetPassword, protect, updatePassword } = require('../controllers/auth')
+const {
+  signup,
+  login,
+  forgotPassword,
+  resetPassword,
+  protect,
+  updatePassword,
+  restrictTo,
+} = require('../controllers/auth')
+const { USER_ROLES } = require('../constants/user')
 
 const router = express.Router()
 
@@ -17,6 +26,6 @@ router.patch('/update-me', protect, updateMe)
 router.delete('/delete-me', protect, deleteMe)
 
 router.route('/').get(getAllUsers).post(createUser)
-router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
+router.route('/:id').get(getUser).patch(updateUser).delete(protect, restrictTo(USER_ROLES.ADMIN), deleteUser)
 
 module.exports = router

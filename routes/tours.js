@@ -13,8 +13,12 @@ const {
   getTourStats,
   getMonthlyPlan,
 } = require('../controllers/tour')
+const reviewsRouter = require('./reviews')
 
 const router = express.Router()
+
+// RELATED TO REVIEWS
+router.use('/:tourId/reviews', reviewsRouter)
 
 router.route('/top-rating').get(aliasTopTours, getAllTours)
 router.route('/stats').get(getTourStats)

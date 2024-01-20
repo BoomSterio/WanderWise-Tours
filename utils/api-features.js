@@ -50,9 +50,10 @@ class APIFeatures {
     if (this.queryStr.fields) {
       const fields = this.constructor.formatQuery(this.queryStr.fields)
       this.query = this.query.select(fields)
+    } else {
+      this.query = this.query.select('-__v')
     }
 
-    this.query = this.query.select('-__v')
     return this
   }
 
