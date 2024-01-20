@@ -12,9 +12,9 @@ class APIFeatures {
   // Handle arrays in query
   static formatQuery = (query) => {
     if (Array.isArray(query)) {
-      query = query.join(' ');
+      query = query.join(' ')
     }
-    return query.replaceAll(',', ' ');
+    return query.replaceAll(',', ' ')
   }
 
   /** Basic and advanced filtering of query. */
@@ -48,7 +48,10 @@ class APIFeatures {
   /** Limiting query fields */
   limitFields() {
     if (this.queryStr.fields) {
-      const fields = this.constructor.formatQuery(this.queryStr.fields)
+      const fields = this.queryStr.fields
+        .split(',')
+        .filter((field) => field.trim().toLowerCase() !== 'password')
+        .join(' ')
       this.query = this.query.select(fields)
     } else {
       this.query = this.query.select('-__v')

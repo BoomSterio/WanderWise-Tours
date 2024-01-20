@@ -1,20 +1,7 @@
 const User = require('../models/user')
 const catchAsync = require('../utils/catch-async')
 const AppError = require('../utils/app-error')
-const { deleteOne } = require('./handlerFactory')
-
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find()
-
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: users.length,
-    data: {
-      users,
-    },
-  })
-})
+const { deleteOne, updateOne, getOne, getAll } = require('./handlerFactory')
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const { password, passwordConfirm, ...data } = req.body
@@ -60,22 +47,15 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This request is not implemented yet',
+    message: 'This request is not implemented. Please use /signup instead.',
   })
 }
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This request is not implemented yet',
-  })
-}
+exports.getAllUsers = getAll(User)
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This request is not implemented yet',
-  })
-}
+exports.getUser = getOne(User)
+
+// DO NOT update passwords with this!
+exports.updateUser = updateOne(User)
 
 exports.deleteUser = deleteOne(User)
