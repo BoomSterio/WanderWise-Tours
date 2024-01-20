@@ -1,7 +1,7 @@
 const User = require('../models/user')
 const catchAsync = require('../utils/catch-async')
 const AppError = require('../utils/app-error')
-const { deleteOne } = require('./handlerFactory')
+const { deleteOne, updateOne } = require('./handlerFactory')
 
 exports.getAllUsers = catchAsync(async (req, res) => {
   const users = await User.find()
@@ -71,11 +71,7 @@ exports.getUser = (req, res) => {
   })
 }
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This request is not implemented yet',
-  })
-}
+// DO NOT update passwords with this!
+exports.updateUser = updateOne(User)
 
 exports.deleteUser = deleteOne(User)

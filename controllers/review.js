@@ -1,7 +1,7 @@
 const Review = require('../models/review')
 const APIFeatures = require('../utils/api-features')
 const catchAsync = require('../utils/catch-async')
-const { deleteOne } = require('./handlerFactory')
+const { deleteOne, updateOne } = require('./handlerFactory')
 
 exports.getAllReviews = catchAsync(async (req, res) => {
   let filter
@@ -31,5 +31,7 @@ exports.createReview = catchAsync(async (req, res, next) => {
     data: { review },
   })
 })
+
+exports.updateReview = updateOne(Review)
 
 exports.deleteReview = deleteOne(Review)
