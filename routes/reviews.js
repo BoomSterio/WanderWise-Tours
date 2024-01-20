@@ -4,7 +4,14 @@ const { USER_ROLES } = require('../constants/user')
 
 const { protect, restrictTo } = require('../controllers/auth')
 
-const { getAllReviews, createReview, deleteReview, updateReview, setUserAndTourIds } = require('../controllers/review')
+const {
+  getAllReviews,
+  createReview,
+  deleteReview,
+  updateReview,
+  setUserAndTourIds,
+  getReview,
+} = require('../controllers/review')
 
 const router = express.Router({ mergeParams: true })
 
@@ -18,6 +25,7 @@ router
 
 router
   .route('/:id')
+  .get(getReview)
   .patch(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), updateReview)
   .delete(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), deleteReview)
 

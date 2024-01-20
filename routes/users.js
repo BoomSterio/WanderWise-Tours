@@ -28,7 +28,7 @@ router.delete('/delete-me', protect, deleteMe)
 router.route('/').get(getAllUsers).post(createUser)
 router
   .route('/:id')
-  .get(getUser)
+  .get(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getUser)
   .patch(protect, restrictTo(USER_ROLES.ADMIN), updateUser)
   .delete(protect, restrictTo(USER_ROLES.ADMIN), deleteUser)
 
