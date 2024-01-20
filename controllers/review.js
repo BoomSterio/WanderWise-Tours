@@ -1,7 +1,7 @@
 const Review = require('../models/review')
 const APIFeatures = require('../utils/api-features')
 const catchAsync = require('../utils/catch-async')
-const { deleteOne, updateOne } = require('./handlerFactory')
+const { deleteOne, updateOne, createOne } = require('./handlerFactory')
 
 exports.getAllReviews = catchAsync(async (req, res) => {
   let filter
@@ -20,17 +20,14 @@ exports.getAllReviews = catchAsync(async (req, res) => {
   })
 })
 
-exports.createReview = catchAsync(async (req, res, next) => {
+exports.setUserAndTourIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId
   if (!req.body.user) req.body.user = req.user.id
 
-  const review = await Review.create(req.body)
+  next()
+}
 
-  res.status(201).json({
-    status: 'success',
-    data: { review },
-  })
-})
+exports.createReview = createOne(Review)
 
 exports.updateReview = updateOne(Review)
 

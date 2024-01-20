@@ -2,7 +2,7 @@ const Tour = require('../models/tour')
 const APIFeatures = require('../utils/api-features')
 const catchAsync = require('../utils/catch-async')
 const AppError = require('../utils/app-error')
-const { deleteOne, updateOne } = require('./handlerFactory')
+const { deleteOne, updateOne, createOne } = require('./handlerFactory')
 
 exports.aliasTopTours = (req, res, next) => {
   req.query = {
@@ -42,14 +42,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   })
 })
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.create(req.body)
-
-  res.status(201).json({
-    status: 'success',
-    data: { tour },
-  })
-})
+exports.createTour = createOne(Tour)
 
 exports.updateTour = updateOne(Tour)
 

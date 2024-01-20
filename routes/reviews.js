@@ -4,14 +4,17 @@ const { USER_ROLES } = require('../constants/user')
 
 const { protect, restrictTo } = require('../controllers/auth')
 
-const { getAllReviews, createReview, deleteReview, updateReview } = require('../controllers/review')
+const { getAllReviews, createReview, deleteReview, updateReview, setUserAndTourIds } = require('../controllers/review')
 
 const router = express.Router({ mergeParams: true })
 
 // POST /reviews
 // or POST /tours/:tourId/reviews (because we added nested routes in toursRouter)
 
-router.route('/').get(protect, getAllReviews).post(protect, restrictTo(USER_ROLES.USER), createReview)
+router
+  .route('/')
+  .get(protect, getAllReviews)
+  .post(protect, restrictTo(USER_ROLES.USER), setUserAndTourIds, createReview)
 
 router
   .route('/:id')
