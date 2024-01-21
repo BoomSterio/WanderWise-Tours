@@ -93,15 +93,13 @@ exports.protect = catchAsync(async (req, res, next) => {
   next()
 })
 
-exports.restrictTo =
-  (...roles) =>
-  (req, res, next) => {
-    // Check if user has one of the roles specified in arguments
-    if (!roles.includes(req.user.role)) {
-      return next(new AppError(403, 'You do not have permission to access this route'))
-    }
-    next()
+exports.restrictTo = (roles) => (req, res, next) => {
+  // Check if user has one of the roles specified in arguments
+  if (!roles.includes(req.user.role)) {
+    return next(new AppError(403, 'You do not have permission to access this route'))
   }
+  next()
+}
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
