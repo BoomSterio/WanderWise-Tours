@@ -28,7 +28,7 @@ describe(
       expect(getRecursiveRoles(TECHNICIAN).sort()).toStrictEqual(expected)
     })
 
-    test('admin role must return and all roles of higher rank', () => {
+    test('admin role must return admin and all roles of higher rank', () => {
       const expected = [ADMIN].sort()
       expect(getRecursiveRoles(ADMIN).sort()).toStrictEqual(expected)
     })

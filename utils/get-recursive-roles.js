@@ -1,5 +1,9 @@
 const { HIERARCHY } = require('../constants/user')
 
+/**
+ * @param {string} role Minimum required role
+ * @returns {string[]} Array with added parent roles
+ */
 const getRecursiveRoles = (role) => {
   const userRoles = [role]
 

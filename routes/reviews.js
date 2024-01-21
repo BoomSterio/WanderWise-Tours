@@ -1,6 +1,7 @@
 const express = require('express')
 
 const { USER_ROLES } = require('../constants/user')
+const getRecursiveRoles = require('../utils/get-recursive-roles')
 
 const { protect, restrictTo } = require('../controllers/auth')
 
@@ -21,12 +22,15 @@ router.use(protect)
 // POST /reviews
 // or POST /tours/:tourId/reviews (because we added nested routes in toursRouter)
 
-router.route('/').get(getAllReviews).post(restrictTo(USER_ROLES.USER), setUserAndTourIds, createReview)
+router
+  .route('/')
+  .get(getAllReviews)
+  .post(restrictTo(getRecursiveRoles(USER_ROLES.USER)), setUserAndTourIds, createReview)
 
 router
   .route('/:id')
   .get(getReview)
-  .patch(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), updateReview)
-  .delete(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), deleteReview)
+  .patch(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), updateReview)
+  .delete(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), deleteReview)
 
 module.exports = router

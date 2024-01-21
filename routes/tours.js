@@ -1,6 +1,7 @@
 const express = require('express')
 
 const { USER_ROLES } = require('../constants/user')
+const getRecursiveRoles = require('../utils/get-recursive-roles')
 
 const { protect, restrictTo } = require('../controllers/auth')
 const {
@@ -28,7 +29,7 @@ router.route('/').get(getAllTours).post(protect, restrictTo(USER_ROLES.ADMIN, US
 router
   .route('/:id')
   .get(getTour)
-  .patch(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.LEAD_GUIDE, USER_ROLES.TECHNICIAN), updateTour)
-  .delete(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.LEAD_GUIDE, USER_ROLES.TECHNICIAN), deleteTour)
+  .patch(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), updateTour)
+  .delete(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), deleteTour)
 
 module.exports = router

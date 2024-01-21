@@ -19,7 +19,9 @@ const {
   updatePassword,
   restrictTo,
 } = require('../controllers/auth')
+
 const { USER_ROLES } = require('../constants/user')
+const getRecursiveRoles = require('../utils/get-recursive-roles')
 
 const router = express.Router()
 
@@ -38,11 +40,14 @@ router.get('/me', setCurrentUserId, getUser)
 router.patch('/update-me', updateMe)
 router.delete('/delete-me', deleteMe)
 
-router.route('/').get(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getAllUsers).post(createUser)
+router
+  .route('/')
+  .get(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), getAllUsers)
+  .post(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), createUser)
 router
   .route('/:id')
-  .get(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getUser)
-  .patch(restrictTo(USER_ROLES.ADMIN), updateUser)
-  .delete(restrictTo(USER_ROLES.ADMIN), deleteUser)
+  .get(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), getUser)
+  .patch(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), updateUser)
+  .delete(restrictTo(getRecursiveRoles(USER_ROLES.ADMIN)), deleteUser)
 
 module.exports = router
