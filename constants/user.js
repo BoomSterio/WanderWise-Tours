@@ -6,7 +6,7 @@ const USER_ROLES = Object.freeze({
   USER: 'user',
 })
 
-const HIERARCHY = {
+const HIERARCHY = Object.freeze({
   [USER_ROLES.ADMIN]: {
     inherits: USER_ROLES.TECHNICIAN,
   },
@@ -16,7 +16,22 @@ const HIERARCHY = {
   [USER_ROLES.LEAD_GUIDE]: {
     inherits: USER_ROLES.GUIDE,
   },
+  [USER_ROLES.GUIDE]: {
+    inherits: USER_ROLES.USER,
+  },
   [USER_ROLES.USER]: {},
+})
+
+const getRecursiveRoles = (role) => {
+  const userRoles = [role]
+
+  const parentRole = Object.keys(HIERARCHY).find((key) => HIERARCHY[key].inherits === role)
+
+  if (parentRole) {
+    userRoles.push(...getRecursiveRoles(parentRole))
+  }
+
+  return userRoles
 }
 
-module.exports = { USER_ROLES, HIERARCHY }
+module.exports = { USER_ROLES, HIERARCHY, getRecursiveRoles }
