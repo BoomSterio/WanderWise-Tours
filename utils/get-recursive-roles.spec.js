@@ -1,4 +1,5 @@
-const { USER_ROLES, getRecursiveRoles } = require('./user')
+const { USER_ROLES } = require('../constants/user')
+const getRecursiveRoles = require('./get-recursive-roles')
 
 const { ADMIN, TECHNICIAN, LEAD_GUIDE, GUIDE, USER } = USER_ROLES
 
