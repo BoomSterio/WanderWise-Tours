@@ -30,7 +30,9 @@ exports.getOne = (Model, options) =>
     const doc = await query
 
     if (!doc) {
-      return next(new AppError(404, `Document with id ${req.params.id} not found`))
+      return next(
+        new AppError(404, `${query.mongooseCollection.modelName || 'Document'} with id ${req.params.id} not found`),
+      )
     }
 
     res.status(200).json({
@@ -60,7 +62,9 @@ exports.updateOne = (Model) =>
     })
 
     if (!doc) {
-      return next(new AppError(404, `Document with id ${req.params.id} not found`))
+      return next(
+        new AppError(404, `${query.mongooseCollection.modelName || 'Document'} with id ${req.params.id} not found`),
+      )
     }
 
     res.status(201).json({
@@ -74,7 +78,9 @@ exports.deleteOne = (Model) =>
     const doc = await Model.findByIdAndDelete(req.params.id)
 
     if (!doc) {
-      return next(new AppError(404, `Document with id ${req.params.id} not found`))
+      return next(
+        new AppError(404, `${query.mongooseCollection.modelName || 'Document'} with id ${req.params.id} not found`),
+      )
     }
 
     res.status(204).json({

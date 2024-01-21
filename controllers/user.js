@@ -51,6 +51,12 @@ exports.createUser = (req, res) => {
   })
 }
 
+exports.setCurrentUserId = (req, res, next) => {
+  req.params.id = req.user.id
+
+  next()
+}
+
 exports.getAllUsers = getAll(User)
 
 exports.getUser = getOne(User)

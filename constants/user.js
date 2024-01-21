@@ -6,7 +6,7 @@ const USER_ROLES = Object.freeze({
   USER: 'user',
 })
 
-const HIERARCHY = {
+const HIERARCHY = Object.freeze({
   [USER_ROLES.ADMIN]: {
     inherits: USER_ROLES.TECHNICIAN,
   },
@@ -16,7 +16,10 @@ const HIERARCHY = {
   [USER_ROLES.LEAD_GUIDE]: {
     inherits: USER_ROLES.GUIDE,
   },
+  [USER_ROLES.GUIDE]: {
+    inherits: USER_ROLES.USER,
+  },
   [USER_ROLES.USER]: {},
-}
+})
 
 module.exports = { USER_ROLES, HIERARCHY }

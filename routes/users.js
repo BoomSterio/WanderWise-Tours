@@ -1,6 +1,15 @@
 const express = require('express')
 
-const { getAllUsers, createUser, getUser, updateUser, deleteUser, updateMe, deleteMe } = require('../controllers/user')
+const {
+  getAllUsers,
+  createUser,
+  getUser,
+  updateUser,
+  deleteUser,
+  updateMe,
+  deleteMe,
+  setCurrentUserId,
+} = require('../controllers/user')
 const {
   signup,
   login,
@@ -10,7 +19,9 @@ const {
   updatePassword,
   restrictTo,
 } = require('../controllers/auth')
+
 const { USER_ROLES } = require('../constants/user')
+const getRecursiveRoles = require('../utils/get-recursive-roles')
 
 const router = express.Router()
 
@@ -20,16 +31,23 @@ router.post('/login', login)
 router.post('/forgot-password', forgotPassword)
 router.patch('/reset-password/:token', resetPassword)
 
-router.patch('/update-my-password', protect, updatePassword)
+// ALL ROUTES AFTER THIS MIDDLEWARE ARE PROTECTED
+router.use(protect)
 
-router.patch('/update-me', protect, updateMe)
-router.delete('/delete-me', protect, deleteMe)
+router.patch('/update-my-password', updatePassword)
 
-router.route('/').get(getAllUsers).post(createUser)
+router.get('/me', setCurrentUserId, getUser)
+router.patch('/update-me', updateMe)
+router.delete('/delete-me', deleteMe)
+
+router
+  .route('/')
+  .get(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), getAllUsers)
+  .post(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), createUser)
 router
   .route('/:id')
-  .get(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getUser)
-  .patch(protect, restrictTo(USER_ROLES.ADMIN), updateUser)
-  .delete(protect, restrictTo(USER_ROLES.ADMIN), deleteUser)
+  .get(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), getUser)
+  .patch(restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), updateUser)
+  .delete(restrictTo(getRecursiveRoles(USER_ROLES.ADMIN)), deleteUser)
 
 module.exports = router
