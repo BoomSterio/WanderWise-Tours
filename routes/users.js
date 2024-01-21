@@ -8,7 +8,6 @@ const {
   deleteUser,
   updateMe,
   deleteMe,
-  getMe,
   setCurrentUserId,
 } = require('../controllers/user')
 const {
@@ -30,17 +29,20 @@ router.post('/login', login)
 router.post('/forgot-password', forgotPassword)
 router.patch('/reset-password/:token', resetPassword)
 
-router.patch('/update-my-password', protect, updatePassword)
+// ALL ROUTES AFTER THIS MIDDLEWARE ARE PROTECTED
+router.use(protect)
 
-router.get('/me', protect, setCurrentUserId, getMe)
-router.patch('/update-me', protect, updateMe)
-router.delete('/delete-me', protect, deleteMe)
+router.patch('/update-my-password', updatePassword)
 
-router.route('/').get(getAllUsers).post(createUser)
+router.get('/me', setCurrentUserId, getUser)
+router.patch('/update-me', updateMe)
+router.delete('/delete-me', deleteMe)
+
+router.route('/').get(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getAllUsers).post(createUser)
 router
   .route('/:id')
-  .get(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getUser)
-  .patch(protect, restrictTo(USER_ROLES.ADMIN), updateUser)
-  .delete(protect, restrictTo(USER_ROLES.ADMIN), deleteUser)
+  .get(restrictTo(USER_ROLES.ADMIN, USER_ROLES.TECHNICIAN), getUser)
+  .patch(restrictTo(USER_ROLES.ADMIN), updateUser)
+  .delete(restrictTo(USER_ROLES.ADMIN), deleteUser)
 
 module.exports = router

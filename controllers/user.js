@@ -57,8 +57,6 @@ exports.setCurrentUserId = (req, res, next) => {
   next()
 }
 
-exports.getMe = getOne(User)
-
 exports.getAllUsers = getAll(User)
 
 exports.getUser = getOne(User)
