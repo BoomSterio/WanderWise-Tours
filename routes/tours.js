@@ -25,11 +25,14 @@ router.route('/top-rating').get(aliasTopTours, getAllTours)
 router.route('/stats').get(getTourStats)
 router.route('/monthly-plan/:year').get(protect, getMonthlyPlan)
 
-router.route('/').get(getAllTours).post(protect, restrictTo(USER_ROLES.ADMIN, USER_ROLES.LEAD_GUIDE), createTour)
+router
+  .route('/')
+  .get(getAllTours)
+  .post(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), createTour)
 router
   .route('/:id')
   .get(getTour)
   .patch(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), updateTour)
-  .delete(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), deleteTour)
+  .delete(protect, restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), deleteTour)
 
 module.exports = router
