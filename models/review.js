@@ -61,13 +61,15 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   ])
 
   const ratingsQuantity = stats[0]?.numRating ?? 0
-  const ratingsAverage = stats[0]?.avgRating ?? 0
+  const ratingsAverage = stats[0]?.avgRating ?? 4.5
 
   await Tour.findByIdAndUpdate(tourId, {
     ratingsQuantity,
     ratingsAverage,
   })
 }
+
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true })
 
 reviewSchema.post('save', function () {
   // this points to current review doc
