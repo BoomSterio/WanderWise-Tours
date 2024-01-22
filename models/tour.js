@@ -135,6 +135,10 @@ const tourSchema = new mongoose.Schema(
   },
 )
 
+// INDEXES (Use Indexes for high read/write ratio to improve query performance)
+tourSchema.index({ price: 1, ratingsAverage: -1 }) // Compound Index
+tourSchema.index({ slug: 1 })
+
 // VIRTUAL PROPERTIES DEFINITION
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7
