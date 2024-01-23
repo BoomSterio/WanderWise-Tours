@@ -13,17 +13,20 @@ const {
   aliasTopTours,
   getTourStats,
   getMonthlyPlan,
+  getToursWithin,
 } = require('../controllers/tour')
 const reviewsRouter = require('./reviews')
 
 const router = express.Router()
 
-// RELATED TO REVIEWS
+// ROUTE RELATED TO REVIEWS
 router.use('/:tourId/reviews', reviewsRouter)
 
 router.route('/top-rating').get(aliasTopTours, getAllTours)
 router.route('/stats').get(getTourStats)
 router.route('/monthly-plan/:year').get(protect, getMonthlyPlan)
+
+router.route('/tours-within/:distance/center/:latlng/unit/:unit').get(protect, getToursWithin)
 
 router
   .route('/')

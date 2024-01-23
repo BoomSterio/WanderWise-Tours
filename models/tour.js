@@ -48,7 +48,7 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       validate: {
         validator: async function (value) {
-          // this keyword only points to current doc on NEW document creation
+          // this keyword only Points to current doc on NEW document creation
           // return value < this.price
           // So to adress this problem, we add `context: 'query'` option in edition tour query
           // then we use async to get doc from query (this)
@@ -102,8 +102,8 @@ const tourSchema = new mongoose.Schema(
       // GeoJSON
       type: {
         type: String,
-        default: 'point',
-        enum: ['point'],
+        default: 'Point',
+        enum: ['Point'],
       },
       coordinates: [Number],
       address: String,
@@ -113,8 +113,8 @@ const tourSchema = new mongoose.Schema(
       {
         type: {
           type: String,
-          default: 'point',
-          enum: ['point'],
+          default: 'Point',
+          enum: ['Point'],
         },
         coordinates: [Number],
         address: String,
@@ -139,6 +139,7 @@ const tourSchema = new mongoose.Schema(
 // INDEXES (Use Indexes for high read/write ratio to improve query performance)
 tourSchema.index({ price: 1, ratingsAverage: -1 }) // Compound Index
 tourSchema.index({ slug: 1 })
+tourSchema.index({ startLocation: '2dsphere' })
 
 // VIRTUAL PROPERTIES DEFINITION
 tourSchema.virtual('durationWeeks').get(function () {
