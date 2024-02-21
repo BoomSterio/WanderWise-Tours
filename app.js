@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
@@ -12,11 +13,18 @@ const toursRouter = require('./routes/tours')
 const usersRouter = require('./routes/users')
 const reviewsRouter = require('./routes/reviews')
 
-const app = express()
-
 const RATE_LIMIT_MINUTES = 60
 
+const app = express()
+
+// Template engine set up
+app.set('view engine', 'pug')
+app.set('views', path.join(__dirname, 'views'))
+
 // 1) Global Middlewares
+
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Set Security HTTP headers
 app.use(helmet())
@@ -43,9 +51,6 @@ app.use(mongoSanitize())
 // Data sanitization against XSS attacks
 app.use(xss())
 
-// Serving static files
-app.use(express.static(`${__dirname}/public`))
-
 // Test middleware for showcase
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString()
@@ -54,6 +59,15 @@ app.use((req, res, next) => {
 
 // 2) Routes
 
+// Frontend
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    name: 'The Park Camper',
+    username: 'Maksym',
+  })
+})
+
+// API
 app.use('/api/v1/tours', toursRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/reviews', reviewsRouter)
