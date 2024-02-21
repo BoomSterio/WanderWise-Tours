@@ -31,10 +31,6 @@ trash
 .trashes
 *~
 
-# Gatsby related
-.cache/
-public
-
 # Editor
 .vscode
 .vscode-test
