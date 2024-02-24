@@ -20,6 +20,7 @@
     "no-unused-vars": ["error", { "argsIgnorePattern": "req|res|next|val|err" }]
   },
   "env": {
+    "browser": true,
     "jest": true
   }
 }
