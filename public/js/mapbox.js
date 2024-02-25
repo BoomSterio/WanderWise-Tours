@@ -42,3 +42,6 @@ map.fitBounds(bounds, {
     right: 100,
   },
 })
+
+const nav = new mapboxgl.NavigationControl()
+map.addControl(nav, 'bottom-left')

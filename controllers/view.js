@@ -26,7 +26,7 @@ exports.getTour = catchAsync(async (req, res) => {
 })
 
 exports.getLoginForm = (req, res) => {
-  res.status(200).render('login', {
+  res.status(200).set('Content-Security-Policy', "connect-src 'self' https://unpkg.com").render('login', {
     title: `Log into your account`,
   })
 }

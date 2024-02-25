@@ -67,10 +67,12 @@ exports.protect = catchAsync(async (req, res, next) => {
   const authHeader = req.headers.authorization
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1]
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt
   }
 
   if (!token) {
-    return next(new AppError(401, 'This user is not logged in!'))
+    return next(new AppError(401, 'You are not logged in!'))
   }
 
   // 2) Verifying token
