@@ -103,6 +103,33 @@ exports.restrictTo = (roles) => (req, res, next) => {
   next()
 }
 
+// Only for rendered pages, no errors!
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  if (!req.cookies.jwt) {
+    // THERE IS NO USER, SKIPPING
+    return next()
+  }
+
+  // 1) Verifying token
+  const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET)
+
+  // 2) Checking if user still exists
+  const user = await User.findById(decoded.id)
+  if (!user) {
+    return next()
+  }
+
+  // 3) Checking is user changed password after token was issued
+  const hasChangedPassword = user.hasChangedPasswordAfter(decoded.iat)
+  if (hasChangedPassword) {
+    return next()
+  }
+
+  // THERE IS A LOGGED IN USER, PUT INTO locals
+  res.locals.user = user
+  next()
+})
+
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on POSTed email
   const user = await User.findOne({ email: req.body.email })

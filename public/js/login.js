@@ -1,6 +1,8 @@
-/* eslint-disable no-undef */
+import axios from 'axios'
 
-const login = async (email, password) => {
+import { showAlert } from './alerts'
+
+export const login = async (email, password) => {
   try {
     const res = await axios({
       method: 'POST',
@@ -10,17 +12,16 @@ const login = async (email, password) => {
         password,
       },
     })
-    console.log(res)
-  } catch (error) {
-    console.log(error.response.data)
+
+    if (res.data.status === 'success') {
+      showAlert('success', 'Logged in successfully')
+      window.setTimeout(() => {
+        window.location.assign('/')
+      }, 500)
+    }
+  } catch (err) {
+    showAlert('error', err.response.data.message)
   }
 }
 
-document.querySelector('.form').addEventListener('submit', (e) => {
-  e.preventDefault()
-
-  const email = document.querySelector('#email').value
-  const password = document.querySelector('#password').value
-
-  login(email, password)
-})
+export const signUp = async () => {}
