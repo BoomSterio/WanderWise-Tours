@@ -420,6 +420,12 @@ body {
   margin-bottom: 2rem;
 }
 
+.signup__text {
+  font-size: 1.7rem;
+  margin-bottom: 2rem;
+  margin-top: -1.7rem;
+}
+
 .overview-box {
   background-color: #f7f7f7;
   display: -webkit-box;

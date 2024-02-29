@@ -583,7 +583,7 @@ var _esRegexpFlagsJs = require("core-js/modules/es.regexp.flags.js");
 var _esTypedArraySetJs = require("core-js/modules/es.typed-array.set.js");
 var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _runtime = require("regenerator-runtime/runtime");
-var _login = require("./login");
+var _auth = require("./auth");
 var _mapbox = require("./mapbox");
 // RENDER MAP
 const mapContainer = document.querySelector("#map");
@@ -592,15 +592,33 @@ if (mapContainer) {
     (0, _mapbox.renderMap)(JSON.parse(locations));
 }
 // LOGIN SUBMIT EVENT LISTENER
-const loginForm = document.querySelector(".form");
+const loginForm = document.querySelector("#login-form");
 if (loginForm) loginForm.addEventListener("submit", (e)=>{
     e.preventDefault();
     const email = document.querySelector("#email").value;
     const password = document.querySelector("#password").value;
-    (0, _login.login)(email, password);
+    (0, _auth.login)({
+        email,
+        password
+    });
+});
+// SIGNUP SUBMIT EVENT LISTENER
+const signupForm = document.querySelector("#signup-form");
+if (signupForm) signupForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const name = document.querySelector("#name").value;
+    const email = document.querySelector("#email").value;
+    const password = document.querySelector("#password").value;
+    const passwordConfirm = document.querySelector("#passwordConfirm").value;
+    (0, _auth.signup)({
+        name,
+        email,
+        password,
+        passwordConfirm
+    });
 });
 
-},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./login":"3oUwE","./mapbox":"eKvGm"}],"jGv1o":[function(require,module,exports) {
+},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg"}],"jGv1o":[function(require,module,exports) {
 "use strict";
 var global = require("c6bf5eee641c0bcc");
 var DESCRIPTORS = require("32574bd865b8e6e5");
@@ -2855,15 +2873,86 @@ try {
     else Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}],"3oUwE":[function(require,module,exports) {
+},{}],"eKvGm":[function(require,module,exports) {
+/* eslint-disable no-undef */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "renderMap", ()=>renderMap);
+const renderMap = (locations)=>{
+    mapboxgl.accessToken = "pk.eyJ1IjoiZXRvemhla3N5biIsImEiOiJjbHN6N211MjMwa3hnMmlsb2Z2N2dhZDNmIn0.Ats3CbrisTuACTNWW4R6tA";
+    const map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/etozheksyn/clsz8b9zq00ey01pigybqfsi1",
+        scrollZoom: false
+    });
+    const bounds = new mapboxgl.LngLatBounds();
+    locations.forEach((l)=>{
+        // Create marker
+        const element = document.createElement("div");
+        element.className = "marker";
+        // Add marker
+        new mapboxgl.Marker({
+            element,
+            anchor: "bottom"
+        }).setLngLat(l.coordinates).addTo(map);
+        // Add popup
+        new mapboxgl.Popup({
+            offset: 32,
+            focusAfterOpen: false
+        }).setLngLat(l.coordinates).setHTML(`<p>Day ${l.day}: ${l.description}</p>`).addTo(map);
+        // Extend the map bounds to include the locations
+        bounds.extend(l.coordinates);
+    });
+    map.fitBounds(bounds, {
+        padding: {
+            top: 150,
+            bottom: 125,
+            left: 100,
+            right: 100
+        }
+    });
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, "bottom-left");
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"7x1kd":[function(require,module,exports) {
+exports.interopDefault = function(a) {
+    return a && a.__esModule ? a : {
+        default: a
+    };
+};
+exports.defineInteropFlag = function(a) {
+    Object.defineProperty(a, "__esModule", {
+        value: true
+    });
+};
+exports.exportAll = function(source, dest) {
+    Object.keys(source).forEach(function(key) {
+        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
+        Object.defineProperty(dest, key, {
+            enumerable: true,
+            get: function() {
+                return source[key];
+            }
+        });
+    });
+    return dest;
+};
+exports.export = function(dest, destName, get) {
+    Object.defineProperty(dest, destName, {
+        enumerable: true,
+        get: get
+    });
+};
+
+},{}],"bIvIg":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
-parcelHelpers.export(exports, "signUp", ()=>signUp);
+parcelHelpers.export(exports, "signup", ()=>signup);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
-const login = async (email, password)=>{
+const login = async ({ email, password })=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "POST",
@@ -2883,9 +2972,30 @@ const login = async (email, password)=>{
         (0, _alerts.showAlert)("error", err.response.data.message);
     }
 };
-const signUp = async ()=>{};
+const signup = async ({ name, email, password, passwordConfirm })=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "POST",
+            url: `http://127.0.0.1:8080/api/v1/users/signup`,
+            data: {
+                name,
+                email,
+                password,
+                passwordConfirm
+            }
+        });
+        if (res.data.status === "success") {
+            (0, _alerts.showAlert)("success", "Signed up successfully!");
+            window.setTimeout(()=>{
+                window.location.assign("/");
+            }, 500);
+        }
+    } catch (err) {
+        (0, _alerts.showAlert)("error", err.response.data.message);
+    }
+};
 
-},{"axios":"7Dvix","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd","./alerts":"41C3R"}],"7Dvix":[function(require,module,exports) {
+},{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"7Dvix":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>(0, _axiosJsDefault.default));
@@ -3567,37 +3677,7 @@ function bind(fn, thisArg) {
     };
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"7x1kd":[function(require,module,exports) {
-exports.interopDefault = function(a) {
-    return a && a.__esModule ? a : {
-        default: a
-    };
-};
-exports.defineInteropFlag = function(a) {
-    Object.defineProperty(a, "__esModule", {
-        value: true
-    });
-};
-exports.exportAll = function(source, dest) {
-    Object.keys(source).forEach(function(key) {
-        if (key === "default" || key === "__esModule" || Object.prototype.hasOwnProperty.call(dest, key)) return;
-        Object.defineProperty(dest, key, {
-            enumerable: true,
-            get: function() {
-                return source[key];
-            }
-        });
-    });
-    return dest;
-};
-exports.export = function(dest, destName, get) {
-    Object.defineProperty(dest, destName, {
-        enumerable: true,
-        get: get
-    });
-};
-
-},{}],"2msKp":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"2msKp":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _utilsJs = require("./../utils.js");
@@ -7305,47 +7385,6 @@ const showAlert = (type, message)=>{
     const markup = `<div class='alert alert--${type}'>${message}</div>`;
     document.querySelector("body").insertAdjacentHTML("afterbegin", markup);
     setTimeout(hideAlert, HIDE_ALERT_AFTER);
-};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"eKvGm":[function(require,module,exports) {
-/* eslint-disable no-undef */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "renderMap", ()=>renderMap);
-const renderMap = (locations)=>{
-    mapboxgl.accessToken = "pk.eyJ1IjoiZXRvemhla3N5biIsImEiOiJjbHN6N211MjMwa3hnMmlsb2Z2N2dhZDNmIn0.Ats3CbrisTuACTNWW4R6tA";
-    const map = new mapboxgl.Map({
-        container: "map",
-        style: "mapbox://styles/etozheksyn/clsz8b9zq00ey01pigybqfsi1",
-        scrollZoom: false
-    });
-    const bounds = new mapboxgl.LngLatBounds();
-    locations.forEach((l)=>{
-        // Create marker
-        const element = document.createElement("div");
-        element.className = "marker";
-        // Add marker
-        new mapboxgl.Marker({
-            element,
-            anchor: "bottom"
-        }).setLngLat(l.coordinates).addTo(map);
-        // Add popup
-        new mapboxgl.Popup({
-            offset: 32,
-            focusAfterOpen: false
-        }).setLngLat(l.coordinates).setHTML(`<p>Day ${l.day}: ${l.description}</p>`).addTo(map);
-        // Extend the map bounds to include the locations
-        bounds.extend(l.coordinates);
-    });
-    map.fitBounds(bounds, {
-        padding: {
-            top: 150,
-            bottom: 125,
-            left: 100,
-            right: 100
-        }
-    });
-    const nav = new mapboxgl.NavigationControl();
-    map.addControl(nav, "bottom-left");
 };
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
