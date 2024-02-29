@@ -1,20 +1,22 @@
 import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 
-import { login, signup } from './auth'
+import { login, logout, signup } from './auth'
 import { renderMap } from './mapbox'
 
-// RENDER MAP
+// DOM ELEMENTS
 const mapContainer = document.querySelector('#map')
+const loginForm = document.querySelector('#login-form')
+const signupForm = document.querySelector('#signup-form')
+const logoutBtn = document.querySelector('.nav__el--logout')
 
+// RENDER MAP
 if (mapContainer) {
   const { locations } = mapContainer.dataset
   renderMap(JSON.parse(locations))
 }
 
 // LOGIN SUBMIT EVENT LISTENER
-const loginForm = document.querySelector('#login-form')
-
 if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -27,8 +29,6 @@ if (loginForm) {
 }
 
 // SIGNUP SUBMIT EVENT LISTENER
-const signupForm = document.querySelector('#signup-form')
-
 if (signupForm) {
   signupForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -40,4 +40,9 @@ if (signupForm) {
 
     signup({ name, email, password, passwordConfirm })
   })
+}
+
+// HANDLING LOG OUT
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', logout)
 }

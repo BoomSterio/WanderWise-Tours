@@ -18,6 +18,7 @@ const {
   protect,
   updatePassword,
   restrictTo,
+  logout,
 } = require('../controllers/auth')
 
 const { USER_ROLES } = require('../constants/user')
@@ -27,6 +28,7 @@ const router = express.Router()
 
 router.post('/signup', signup)
 router.post('/login', login)
+router.get('/logout', logout)
 
 router.post('/forgot-password', forgotPassword)
 router.patch('/reset-password/:token', resetPassword)

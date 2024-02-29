@@ -585,14 +585,17 @@ var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _runtime = require("regenerator-runtime/runtime");
 var _auth = require("./auth");
 var _mapbox = require("./mapbox");
-// RENDER MAP
+// DOM ELEMENTS
 const mapContainer = document.querySelector("#map");
+const loginForm = document.querySelector("#login-form");
+const signupForm = document.querySelector("#signup-form");
+const logoutBtn = document.querySelector(".nav__el--logout");
+// RENDER MAP
 if (mapContainer) {
     const { locations } = mapContainer.dataset;
     (0, _mapbox.renderMap)(JSON.parse(locations));
 }
 // LOGIN SUBMIT EVENT LISTENER
-const loginForm = document.querySelector("#login-form");
 if (loginForm) loginForm.addEventListener("submit", (e)=>{
     e.preventDefault();
     const email = document.querySelector("#email").value;
@@ -603,7 +606,6 @@ if (loginForm) loginForm.addEventListener("submit", (e)=>{
     });
 });
 // SIGNUP SUBMIT EVENT LISTENER
-const signupForm = document.querySelector("#signup-form");
 if (signupForm) signupForm.addEventListener("submit", (e)=>{
     e.preventDefault();
     const name = document.querySelector("#name").value;
@@ -617,6 +619,8 @@ if (signupForm) signupForm.addEventListener("submit", (e)=>{
         passwordConfirm
     });
 });
+// HANDLING LOG OUT
+if (logoutBtn) logoutBtn.addEventListener("click", (0, _auth.logout));
 
 },{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg"}],"jGv1o":[function(require,module,exports) {
 "use strict";
@@ -2949,6 +2953,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "login", ()=>login);
 parcelHelpers.export(exports, "signup", ()=>signup);
+parcelHelpers.export(exports, "logout", ()=>logout);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
@@ -2963,7 +2968,7 @@ const login = async ({ email, password })=>{
             }
         });
         if (res.data.status === "success") {
-            (0, _alerts.showAlert)("success", "Logged in successfully");
+            (0, _alerts.showAlert)("success", "Logged in successfully!");
             window.setTimeout(()=>{
                 window.location.assign("/");
             }, 500);
@@ -2992,6 +2997,22 @@ const signup = async ({ name, email, password, passwordConfirm })=>{
         }
     } catch (err) {
         (0, _alerts.showAlert)("error", err.response.data.message);
+    }
+};
+const logout = async ()=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "GET",
+            url: `http://127.0.0.1:8080/api/v1/users/logout`
+        });
+        if (res.data.status === "success") {
+            (0, _alerts.showAlert)("success", "Logged out successfully!");
+            window.setTimeout(()=>{
+                window.location.reload(true);
+            }, 500);
+        }
+    } catch (err) {
+        (0, _alerts.showAlert)("error", "Could not log out, please try again!");
     }
 };
 
