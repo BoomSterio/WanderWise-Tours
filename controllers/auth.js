@@ -97,6 +97,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = user
+  res.locals.user = user
   next()
 })
 
@@ -108,7 +109,10 @@ exports.restrictTo = (roles) => (req, res, next) => {
   next()
 }
 
-// Only for rendered pages, no errors!
+/**
+ * Checks if user is logged in and pushes user info object to res.locals making it accessible from pug templates.
+ * Use if only for RENDERED pages, returns no errors!
+ */
 exports.isLoggedIn = async (req, res, next) => {
   try {
     if (!req.cookies.jwt) {
