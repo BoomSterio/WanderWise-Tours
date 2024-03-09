@@ -36,6 +36,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^5.13.20",
     "morgan": "^1.10.0",
+    "multer": "*",
     "nodemailer": "^6.9.7",
     "pug": "^3.0.2",
     "regenerator-runtime": "^0.13.11",
