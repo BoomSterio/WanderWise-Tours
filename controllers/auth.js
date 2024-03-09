@@ -5,7 +5,7 @@ const crypto = require('crypto')
 const User = require('../models/user')
 const catchAsync = require('../utils/catch-async')
 const AppError = require('../utils/app-error')
-const sendEmail = require('./email')
+const sendEmail = require('../utils/email')
 
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN })

@@ -13,7 +13,7 @@ const sendEmail = async ({ to, subject, text }) => {
   })
   // 2) Define the email options
   const emailOptions = {
-    from: 'Maksym from WanderWise Tours <wander-wise@tours.com',
+    from: 'Maksym from WanderWise Tours <wander-wise@tours.com>',
     to,
     subject,
     text,
