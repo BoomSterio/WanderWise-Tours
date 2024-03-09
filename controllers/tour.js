@@ -1,7 +1,61 @@
+const multer = require('multer')
+const sharp = require('sharp')
+
 const Tour = require('../models/tour')
 const AppError = require('../utils/app-error')
 const catchAsync = require('../utils/catch-async')
 const { deleteOne, updateOne, createOne, getOne, getAll } = require('./handlerFactory')
+
+const multerStorage = multer.memoryStorage() // saves file to buffer memory: req.file.buffer
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true)
+    return
+  }
+  cb(new AppError(400, 'Only files of type image are allowed!'), false)
+}
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+})
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+])
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.imageCover || !req.files.images) return next()
+
+  // 1) Cover image
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`
+
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`)
+
+  // 2) Images
+  req.body.images = []
+
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`
+      await sharp(req.files.images[i].buffer)
+        .resize(1000, 667)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`)
+
+      req.body.images.push(filename)
+    }),
+  )
+
+  next()
+})
 
 exports.aliasTopTours = (req, res, next) => {
   req.query = {

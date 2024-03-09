@@ -23,7 +23,7 @@ const multerFilter = (req, file, cb) => {
     cb(null, true)
     return
   }
-  cb(new AppError(400, 'File should be of image type!'), false)
+  cb(new AppError(400, 'Only files of type image are allowed!'), false)
 }
 
 const upload = multer({
@@ -33,19 +33,19 @@ const upload = multer({
 
 exports.uploadUserImage = upload.single('image')
 
-exports.resizeUserImage = (req, res, next) => {
+exports.resizeUserImage = catchAsync(async (req, res, next) => {
   if (!req.file) return next()
 
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`
 
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(256, 256)
     .toFormat('jpeg')
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`)
 
   next()
-}
+})
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   const { password, passwordConfirm, ...data } = req.body
