@@ -85,6 +85,7 @@ app.use('/api', limiter)
 
 // Body parser, reading data from the body into req.body and limiting body size
 app.use(express.json({ limit: '10kb' }))
+app.use(express.urlencoded({ extended: true, limit: '10kb' }))
 
 // Parsing cookoes to req.cookies
 app.use(cookieParser())

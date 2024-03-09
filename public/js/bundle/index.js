@@ -583,13 +583,16 @@ var _esRegexpFlagsJs = require("core-js/modules/es.regexp.flags.js");
 var _esTypedArraySetJs = require("core-js/modules/es.typed-array.set.js");
 var _webImmediateJs = require("core-js/modules/web.immediate.js");
 var _runtime = require("regenerator-runtime/runtime");
-var _auth = require("./auth");
 var _mapbox = require("./mapbox");
+var _auth = require("./auth");
+var _users = require("./users");
 // DOM ELEMENTS
 const mapContainer = document.querySelector("#map");
 const loginForm = document.querySelector("#login-form");
 const signupForm = document.querySelector("#signup-form");
 const logoutBtn = document.querySelector(".nav__el--logout");
+const userDataForm = document.querySelector(".form-user-data");
+const userPasswordForm = document.querySelector(".form-user-password");
 // RENDER MAP
 if (mapContainer) {
     const { locations } = mapContainer.dataset;
@@ -621,8 +624,33 @@ if (signupForm) signupForm.addEventListener("submit", (e)=>{
 });
 // HANDLING LOG OUT
 if (logoutBtn) logoutBtn.addEventListener("click", (0, _auth.logout));
+// HANDLING CURRENT USER DATA FORM SUBMIT
+if (userDataForm) userDataForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const name = document.querySelector("#name").value;
+    const email = document.querySelector("#email").value;
+    (0, _users.updateMyGeneralData)({
+        name,
+        email
+    });
+});
+if (userPasswordForm) userPasswordForm.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const passwordCurrent = document.querySelector("#password-current").value;
+    const password = document.querySelector("#password").value;
+    const passwordConfirm = document.querySelector("#password-confirm").value;
+    const updatePasswordBtn = document.querySelector(".btn--save-password");
+    const updatePasswordBtnText = updatePasswordBtn.innerHTML;
+    updatePasswordBtn.innerHTML = "Loading...";
+    await (0, _users.updateMyPassword)({
+        passwordCurrent,
+        password,
+        passwordConfirm
+    });
+    updatePasswordBtn.innerHTML = updatePasswordBtnText;
+});
 
-},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg"}],"jGv1o":[function(require,module,exports) {
+},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg","./users":"hSlOl"}],"jGv1o":[function(require,module,exports) {
 "use strict";
 var global = require("c6bf5eee641c0bcc");
 var DESCRIPTORS = require("32574bd865b8e6e5");
@@ -7408,6 +7436,56 @@ const showAlert = (type, message)=>{
     setTimeout(hideAlert, HIDE_ALERT_AFTER);
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"hSlOl":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "updateMyGeneralData", ()=>updateMyGeneralData);
+parcelHelpers.export(exports, "updateMyPassword", ()=>updateMyPassword);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alerts = require("./alerts");
+const updateMyGeneralData = async ({ name, email })=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "PATCH",
+            url: `http://127.0.0.1:8080/api/v1/users/update-me`,
+            data: {
+                name,
+                email
+            }
+        });
+        if (res.data.status === "success") {
+            (0, _alerts.showAlert)("success", "Profile updated!");
+            window.setTimeout(()=>{
+                window.location.reload(true);
+            }, 500);
+        }
+    } catch (err) {
+        (0, _alerts.showAlert)("error", `Could not update profile: ${err.response.data.message}`);
+    }
+};
+const updateMyPassword = async ({ passwordCurrent, password, passwordConfirm })=>{
+    try {
+        const res = await (0, _axiosDefault.default)({
+            method: "PATCH",
+            url: `http://127.0.0.1:8080/api/v1/users/update-my-password`,
+            data: {
+                passwordCurrent,
+                password,
+                passwordConfirm
+            }
+        });
+        if (res.data.status === "success") {
+            (0, _alerts.showAlert)("success", "Password updated successfully!");
+            window.setTimeout(()=>{
+                window.location.reload(true);
+            }, 500);
+        }
+    } catch (err) {
+        (0, _alerts.showAlert)("error", `Could not update password: ${err.response.data.message}`);
+    }
+};
+
+},{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
 
 //# sourceMappingURL=index.js.map
