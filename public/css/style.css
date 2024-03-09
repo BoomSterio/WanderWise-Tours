@@ -88,7 +88,7 @@ body {
 
 .alert {
   position: fixed;
-  top: 0;
+  top: 4rem;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
@@ -418,6 +418,12 @@ body {
 }
 .description-box .description__text:not(:last-child) {
   margin-bottom: 2rem;
+}
+
+.signup__text {
+  font-size: 1.7rem;
+  margin-bottom: 2rem;
+  margin-top: -1.7rem;
 }
 
 .overview-box {
@@ -1120,7 +1126,7 @@ body {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  max-width: 80rem;
+  width: 100%;
   text-align: center;
 }
 .error__title {

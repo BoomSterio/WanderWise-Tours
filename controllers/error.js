@@ -29,21 +29,59 @@ const handleReadableErrors = (err) => {
   return err
 }
 
-const sendErrDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    error: err,
-    stack: err.stack,
-  })
-}
+const isReqHitsAPI = (req) => req.originalUrl.startsWith('/api')
 
-const sendErrProd = (err, res) => {
-  // Operational, trusted error: send message to client
-  if (err.isOperational) {
+const sendErrDev = (err, req, res) => {
+  // A) API
+  if (isReqHitsAPI(req)) {
     return res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
+      error: err,
+      stack: err.stack,
+    })
+  }
+
+  // B) RENDERED WEBSITE
+  console.error('ERROR💥', err)
+
+  res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    message: err.message,
+    status: err.statusCode,
+  })
+}
+
+const sendErrProd = (err, req, res) => {
+  // A) API
+  if (isReqHitsAPI(req)) {
+    // Operational, trusted error: send message to client
+    if (err.isOperational) {
+      return res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      })
+    }
+
+    // Programming or other unknown error: don't leak error details
+    // 1) Log error
+    console.error('ERROR💥', err)
+
+    // 2) Send general error message
+    return res.status(500).json({
+      status: 'error',
+      message: 'Something went wrong!',
+    })
+  }
+
+  // B) RENDERED WEBSITE
+
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    return res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      message: err.message,
+      status: err.statusCode,
     })
   }
 
@@ -51,10 +89,10 @@ const sendErrProd = (err, res) => {
   // 1) Log error
   console.error('ERROR💥', err)
 
-  //2) Send general error message
-  res.status(500).json({
-    status: 'error',
-    message: 'Something went wrong!',
+  // 2) Send general error message
+  res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    message: 'Please try again later.',
   })
 }
 
@@ -65,7 +103,7 @@ module.exports = (err, req, res, next) => {
   error.status = error.status || 'error'
 
   if (process.env.NODE_ENV === 'development') {
-    return sendErrDev(error, res)
+    return sendErrDev(error, req, res)
   }
-  sendErrProd(error, res)
+  sendErrProd(error, req, res)
 }

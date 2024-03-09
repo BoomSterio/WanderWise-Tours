@@ -31,6 +31,9 @@ trash
 .trashes
 *~
 
+# Parcel
+.parcel-cache
+
 # Editor
 .vscode
 .vscode-test

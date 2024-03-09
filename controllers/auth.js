@@ -61,16 +61,23 @@ exports.login = catchAsync(async (req, res, next) => {
   createAndSendToken(user, 200, res)
 })
 
+exports.logout = catchAsync(async (req, res) => {
+  res.cookie('jwt', 'logged out', { expires: new Date(Date.now() + 5 * 1000), httpOnly: true })
+  res.status(200).json({ status: 'success', data: null })
+})
+
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and checking if it is there
   let token
   const authHeader = req.headers.authorization
   if (authHeader && authHeader.startsWith('Bearer ')) {
     token = authHeader.split(' ')[1]
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt
   }
 
   if (!token) {
-    return next(new AppError(401, 'This user is not logged in!'))
+    return next(new AppError(401, 'You are not logged in!'))
   }
 
   // 2) Verifying token
@@ -90,6 +97,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // GRANT ACCESS TO PROTECTED ROUTE
   req.user = user
+  res.locals.user = user
   next()
 })
 
@@ -99,6 +107,40 @@ exports.restrictTo = (roles) => (req, res, next) => {
     return next(new AppError(403, 'You do not have permission to access this route'))
   }
   next()
+}
+
+/**
+ * Checks if user is logged in and pushes user info object to res.locals making it accessible from pug templates.
+ * Use if only for RENDERED pages, returns no errors!
+ */
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if (!req.cookies.jwt) {
+      // THERE IS NO USER, SKIPPING
+      return next()
+    }
+
+    // 1) Verifying token
+    const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET)
+
+    // 2) Checking if user still exists
+    const user = await User.findById(decoded.id)
+    if (!user) {
+      return next()
+    }
+
+    // 3) Checking is user changed password after token was issued
+    const hasChangedPassword = user.hasChangedPasswordAfter(decoded.iat)
+    if (hasChangedPassword) {
+      return next()
+    }
+
+    // THERE IS A LOGGED IN USER, PUT INTO locals
+    res.locals.user = user
+    next()
+  } catch (err) {
+    return next()
+  }
 }
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
