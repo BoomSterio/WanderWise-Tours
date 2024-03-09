@@ -12,6 +12,7 @@ const signupForm = document.querySelector('#signup-form')
 const logoutBtn = document.querySelector('.nav__el--logout')
 const userDataForm = document.querySelector('.form-user-data')
 const userPasswordForm = document.querySelector('.form-user-password')
+const userImageInput = document.querySelector('.form-user-data .form__upload')
 
 // RENDER MAP
 if (mapContainer) {
@@ -55,13 +56,16 @@ if (userDataForm) {
   userDataForm.addEventListener('submit', (e) => {
     e.preventDefault()
 
-    const name = document.querySelector('#name').value
-    const email = document.querySelector('#email').value
+    const form = new FormData()
+    form.append('name', document.getElementById('name').value)
+    form.append('email', document.getElementById('email').value)
+    form.append('image', document.getElementById('image').files[0])
 
-    updateMyGeneralData({ name, email })
+    updateMyGeneralData(form)
   })
 }
 
+// HANDLING CURRENT USER PASSWORD UPDATE
 if (userPasswordForm) {
   userPasswordForm.addEventListener('submit', async (e) => {
     e.preventDefault()
@@ -76,5 +80,23 @@ if (userPasswordForm) {
     updatePasswordBtn.innerHTML = 'Loading...'
     await updateMyPassword({ passwordCurrent, password, passwordConfirm })
     updatePasswordBtn.innerHTML = updatePasswordBtnText
+  })
+}
+
+// PREVIEWING SELECTED USER IMAGE
+if (userImageInput) {
+  userImageInput.addEventListener('change', function () {
+    const img = document.querySelector('.form-user-data .form__user-photo')
+    const { 0: file, length } = this.files
+
+    if (length < 1) {
+      return
+    }
+
+    img.src = URL.createObjectURL(file)
+
+    img.onload = function () {
+      URL.revokeObjectURL(this.src)
+    }
   })
 }
