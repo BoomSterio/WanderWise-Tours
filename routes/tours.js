@@ -15,6 +15,8 @@ const {
   getMonthlyPlan,
   getToursWithin,
   getDistances,
+  resizeTourImages,
+  uploadTourImages,
 } = require('../controllers/tour')
 const reviewsRouter = require('./reviews')
 
@@ -35,10 +37,11 @@ router
   .route('/')
   .get(getAllTours)
   .post(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), createTour)
+
 router
   .route('/:id')
   .get(getTour)
-  .patch(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), updateTour)
+  .patch(protect, restrictTo(getRecursiveRoles(USER_ROLES.LEAD_GUIDE)), uploadTourImages, resizeTourImages, updateTour)
   .delete(protect, restrictTo(getRecursiveRoles(USER_ROLES.TECHNICIAN)), deleteTour)
 
 module.exports = router

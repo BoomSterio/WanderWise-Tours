@@ -593,6 +593,7 @@ const signupForm = document.querySelector("#signup-form");
 const logoutBtn = document.querySelector(".nav__el--logout");
 const userDataForm = document.querySelector(".form-user-data");
 const userPasswordForm = document.querySelector(".form-user-password");
+const userImageInput = document.querySelector(".form-user-data .form__upload");
 // RENDER MAP
 if (mapContainer) {
     const { locations } = mapContainer.dataset;
@@ -627,13 +628,13 @@ if (logoutBtn) logoutBtn.addEventListener("click", (0, _auth.logout));
 // HANDLING CURRENT USER DATA FORM SUBMIT
 if (userDataForm) userDataForm.addEventListener("submit", (e)=>{
     e.preventDefault();
-    const name = document.querySelector("#name").value;
-    const email = document.querySelector("#email").value;
-    (0, _users.updateMyGeneralData)({
-        name,
-        email
-    });
+    const form = new FormData();
+    form.append("name", document.getElementById("name").value);
+    form.append("email", document.getElementById("email").value);
+    form.append("image", document.getElementById("image").files[0]);
+    (0, _users.updateMyGeneralData)(form);
 });
+// HANDLING CURRENT USER PASSWORD UPDATE
 if (userPasswordForm) userPasswordForm.addEventListener("submit", async (e)=>{
     e.preventDefault();
     const passwordCurrent = document.querySelector("#password-current").value;
@@ -648,6 +649,16 @@ if (userPasswordForm) userPasswordForm.addEventListener("submit", async (e)=>{
         passwordConfirm
     });
     updatePasswordBtn.innerHTML = updatePasswordBtnText;
+});
+// PREVIEWING SELECTED USER IMAGE
+if (userImageInput) userImageInput.addEventListener("change", function() {
+    const img = document.querySelector(".form-user-data .form__user-photo");
+    const { 0: file, length } = this.files;
+    if (length < 1) return;
+    img.src = URL.createObjectURL(file);
+    img.onload = function() {
+        URL.revokeObjectURL(this.src);
+    };
 });
 
 },{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg","./users":"hSlOl"}],"jGv1o":[function(require,module,exports) {
@@ -7444,15 +7455,12 @@ parcelHelpers.export(exports, "updateMyPassword", ()=>updateMyPassword);
 var _axios = require("axios");
 var _axiosDefault = parcelHelpers.interopDefault(_axios);
 var _alerts = require("./alerts");
-const updateMyGeneralData = async ({ name, email })=>{
+const updateMyGeneralData = async (values)=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "PATCH",
             url: `http://127.0.0.1:8080/api/v1/users/update-me`,
-            data: {
-                name,
-                email
-            }
+            data: values
         });
         if (res.data.status === "success") {
             (0, _alerts.showAlert)("success", "Profile updated!");
