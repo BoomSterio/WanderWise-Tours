@@ -10,6 +10,7 @@ const {
   deleteMe,
   setCurrentUserId,
   uploadUserImage,
+  resizeUserImage,
 } = require('../controllers/user')
 const {
   signup,
@@ -40,7 +41,7 @@ router.use(protect)
 router.patch('/update-my-password', updatePassword)
 
 router.get('/me', setCurrentUserId, getUser)
-router.patch('/update-me', uploadUserImage, updateMe)
+router.patch('/update-me', uploadUserImage, resizeUserImage, updateMe)
 router.delete('/delete-me', deleteMe)
 
 router
