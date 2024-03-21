@@ -14,6 +14,7 @@ const viewRouter = require('./routes/view')
 const toursRouter = require('./routes/tours')
 const usersRouter = require('./routes/users')
 const reviewsRouter = require('./routes/reviews')
+const bookingsRouter = require('./routes/bookings')
 
 const RATE_LIMIT_MINUTES = 60
 
@@ -111,6 +112,7 @@ app.use('/', viewRouter)
 app.use('/api/v1/tours', toursRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/reviews', reviewsRouter)
+app.use('/api/v1/bookings', bookingsRouter)
 
 app.all('*', (req, res, next) => {
   next(new AppError(404, `Can't find ${req.originalUrl} resource! Please make sure the path is correct.`))
