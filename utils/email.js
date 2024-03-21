@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer')
 const pug = require('pug')
 const htmlToText = require('html-to-text')
+const Transport = require('nodemailer-brevo-transport')
 
 module.exports = class Email {
   constructor(user, url) {
@@ -12,7 +13,7 @@ module.exports = class Email {
 
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
-      return 0
+      return nodemailer.createTransport(new Transport({ apiKey: process.env.EMAIL_BREVO_API_KEY }))
     }
 
     return nodemailer.createTransport({

@@ -39,6 +39,7 @@
     "morgan": "^1.10.0",
     "multer": "*",
     "nodemailer": "^6.9.7",
+    "nodemailer-brevo-transport": "^2.1.0",
     "pug": "^3.0.2",
     "regenerator-runtime": "^0.13.11",
     "sharp": "^0.33.2",
