@@ -4,6 +4,7 @@ import 'regenerator-runtime/runtime'
 import { renderMap } from './mapbox'
 import { login, logout, signup } from './auth'
 import { updateMyGeneralData, updateMyPassword } from './users'
+import { bookTour } from './stripe'
 
 // DOM ELEMENTS
 const mapContainer = document.querySelector('#map')
@@ -13,6 +14,7 @@ const logoutBtn = document.querySelector('.nav__el--logout')
 const userDataForm = document.querySelector('.form-user-data')
 const userPasswordForm = document.querySelector('.form-user-password')
 const userImageInput = document.querySelector('.form-user-data .form__upload')
+const bookTourBtn = document.querySelector('#book-tour')
 
 // RENDER MAP
 if (mapContainer) {
@@ -98,5 +100,15 @@ if (userImageInput) {
     img.onload = function () {
       URL.revokeObjectURL(this.src)
     }
+  })
+}
+
+// TOUR BOOKING
+if (bookTourBtn) {
+  bookTourBtn.addEventListener('click', (e) => {
+    e.target.textContent = 'Processing...'
+    e.target.disabled = true
+    const { tourId } = e.target.dataset
+    bookTour(tourId)
   })
 }

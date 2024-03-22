@@ -586,6 +586,7 @@ var _runtime = require("regenerator-runtime/runtime");
 var _mapbox = require("./mapbox");
 var _auth = require("./auth");
 var _users = require("./users");
+var _stripe = require("./stripe");
 // DOM ELEMENTS
 const mapContainer = document.querySelector("#map");
 const loginForm = document.querySelector("#login-form");
@@ -594,6 +595,7 @@ const logoutBtn = document.querySelector(".nav__el--logout");
 const userDataForm = document.querySelector(".form-user-data");
 const userPasswordForm = document.querySelector(".form-user-password");
 const userImageInput = document.querySelector(".form-user-data .form__upload");
+const bookTourBtn = document.querySelector("#book-tour");
 // RENDER MAP
 if (mapContainer) {
     const { locations } = mapContainer.dataset;
@@ -660,8 +662,15 @@ if (userImageInput) userImageInput.addEventListener("change", function() {
         URL.revokeObjectURL(this.src);
     };
 });
+// TOUR BOOKING
+if (bookTourBtn) bookTourBtn.addEventListener("click", (e)=>{
+    e.target.textContent = "Processing...";
+    e.target.disabled = true;
+    const { tourId } = e.target.dataset;
+    (0, _stripe.bookTour)(tourId);
+});
 
-},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg","./users":"hSlOl"}],"jGv1o":[function(require,module,exports) {
+},{"core-js/modules/es.regexp.flags.js":"jGv1o","core-js/modules/es.typed-array.set.js":"3VuAs","core-js/modules/web.immediate.js":"a10Rs","regenerator-runtime/runtime":"jM53n","./mapbox":"eKvGm","./auth":"bIvIg","./users":"hSlOl","./stripe":"bkltp"}],"jGv1o":[function(require,module,exports) {
 "use strict";
 var global = require("c6bf5eee641c0bcc");
 var DESCRIPTORS = require("32574bd865b8e6e5");
@@ -7494,6 +7503,118 @@ const updateMyPassword = async ({ passwordCurrent, password, passwordConfirm })=
     }
 };
 
-},{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
+},{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}],"bkltp":[function(require,module,exports) {
+/* eslint-disable no-undef */ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "bookTour", ()=>bookTour);
+var _axios = require("axios");
+var _axiosDefault = parcelHelpers.interopDefault(_axios);
+var _alerts = require("./alerts");
+const stripe = Stripe("pk_test_51OwqklCPf7BAtHGEGfQuvznxYOAosNfDgtyqjUh1hYOj9nu7izdW9anl8cP3yoroSvTwcNCVau9FSFviXkyaWdKr002NWlDPGj");
+const bookTour = async (tourId)=>{
+    try {
+        // 1) Get checkout session from API
+        const { data: { session } } = await (0, _axiosDefault.default)(`http://127.0.0.1:8080/api/v1/bookings/checkout-session/${tourId}`);
+        await stripe.redirectToCheckout({
+            sessionId: session.id
+        });
+    } catch (err) {
+        (0, _alerts.showAlert)("error", `Could not book tour: ${err.response.data.message}`);
+    }
+// 2) Display checkout form and charge credit card information}
+} // // The items the customer wants to buy
+ // const items = [{ id: 'xl-tshirt' }]
+ // let elements
+ // // ------- UI helpers -------
+ // function showMessage(messageText) {
+ //   const messageContainer = document.querySelector('#payment-message')
+ //   messageContainer.classList.remove('hidden')
+ //   messageContainer.textContent = messageText
+ //   setTimeout(() => {
+ //     messageContainer.classList.add('hidden')
+ //     messageContainer.textContent = ''
+ //   }, 4000)
+ // }
+ // // Show a spinner on payment submission
+ // function setLoading(isLoading) {
+ //   if (isLoading) {
+ //     // Disable the button and show a spinner
+ //     document.querySelector('#submit').disabled = true
+ //     document.querySelector('#spinner').classList.remove('hidden')
+ //     document.querySelector('#button-text').classList.add('hidden')
+ //   } else {
+ //     document.querySelector('#submit').disabled = false
+ //     document.querySelector('#spinner').classList.add('hidden')
+ //     document.querySelector('#button-text').classList.remove('hidden')
+ //   }
+ // }
+ // // Fetches a payment intent and captures the client secret
+ // async function initialize() {
+ //   const response = await fetch('/create-payment-intent', {
+ //     method: 'POST',
+ //     headers: { 'Content-Type': 'application/json' },
+ //     body: JSON.stringify({ items }),
+ //   })
+ //   const { clientSecret } = await response.json()
+ //   const appearance = {
+ //     theme: 'stripe',
+ //   }
+ //   elements = stripe.elements({ appearance, clientSecret })
+ //   const paymentElementOptions = {
+ //     layout: 'tabs',
+ //   }
+ //   const paymentElement = elements.create('payment', paymentElementOptions)
+ //   paymentElement.mount('#payment-element')
+ // }
+ // async function handleSubmit(e) {
+ //   e.preventDefault()
+ //   setLoading(true)
+ //   const { error } = await stripe.confirmPayment({
+ //     elements,
+ //     confirmParams: {
+ //       // Make sure to change this to your payment completion page
+ //       return_url: 'http://localhost:4242/checkout.html',
+ //     },
+ //   })
+ //   // This point will only be reached if there is an immediate error when
+ //   // confirming the payment. Otherwise, your customer will be redirected to
+ //   // your `return_url`. For some payment methods like iDEAL, your customer will
+ //   // be redirected to an intermediate site first to authorize the payment, then
+ //   // redirected to the `return_url`.
+ //   if (error.type === 'card_error' || error.type === 'validation_error') {
+ //     showMessage(error.message)
+ //   } else {
+ //     showMessage('An unexpected error occurred.')
+ //   }
+ //   setLoading(false)
+ // }
+ // document.querySelector('#payment-form').addEventListener('submit', handleSubmit)
+ // // Fetches the payment intent status after payment submission
+ // async function checkStatus() {
+ //   const clientSecret = new URLSearchParams(window.location.search).get('payment_intent_client_secret')
+ //   if (!clientSecret) {
+ //     return
+ //   }
+ //   const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret)
+ //   switch (paymentIntent.status) {
+ //     case 'succeeded':
+ //       showMessage('Payment succeeded!')
+ //       break
+ //     case 'processing':
+ //       showMessage('Your payment is processing.')
+ //       break
+ //     case 'requires_payment_method':
+ //       showMessage('Your payment was not successful, please try again.')
+ //       break
+ //     default:
+ //       showMessage('Something went wrong.')
+ //       break
+ //   }
+ // }
+ // initialize()
+ // checkStatus()
+;
+
+},{"axios":"7Dvix","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd","./alerts":"41C3R"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
 
 //# sourceMappingURL=index.js.map
