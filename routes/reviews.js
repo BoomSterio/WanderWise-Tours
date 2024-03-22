@@ -22,10 +22,7 @@ router.use(protect)
 // POST /reviews
 // or POST /tours/:tourId/reviews (because we added nested routes in toursRouter)
 
-router
-  .route('/')
-  .get(getAllReviews)
-  .post(restrictTo(getRecursiveRoles(USER_ROLES.USER)), setUserAndTourIds, createReview)
+router.route('/').get(getAllReviews).post(setUserAndTourIds, createReview)
 
 router
   .route('/:id')

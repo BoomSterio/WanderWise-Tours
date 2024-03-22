@@ -104,6 +104,10 @@ exports.protect = catchAsync(async (req, res, next) => {
   next()
 })
 
+/**
+ * Checks if the user has required permissions
+ * @param Array<string> Array of roles
+ */
 exports.restrictTo = (roles) => (req, res, next) => {
   // Check if user has one of the roles specified in arguments
   if (!roles.includes(req.user.role)) {

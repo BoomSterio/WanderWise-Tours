@@ -6,6 +6,7 @@ const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const cookieParser = require('cookie-parser')
+const csp = require('express-csp')
 
 const AppError = require('./utils/app-error')
 
@@ -14,6 +15,7 @@ const viewRouter = require('./routes/view')
 const toursRouter = require('./routes/tours')
 const usersRouter = require('./routes/users')
 const reviewsRouter = require('./routes/reviews')
+const bookingsRouter = require('./routes/bookings')
 
 const RATE_LIMIT_MINUTES = 60
 
@@ -29,46 +31,72 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Set Security HTTP headers
-const scriptSrcUrls = [
-  'https://unpkg.com/',
-  'https://*.tiles.mapbox.com',
-  'https://api.mapbox.com',
-  'https://events.mapbox.com',
-  'https://js.stripe.com',
-  'https://m.stripe.network',
-  'https://*.cloudflare.com',
-]
-const styleSrcUrls = ['https://unpkg.com/', 'https://*.tiles.mapbox.com', 'https://fonts.googleapis.com/']
-const connectSrcUrls = [
-  'https://unpkg.com',
-  'https://*.tiles.mapbox.com',
-  'https://api.mapbox.com',
-  'https://events.mapbox.com',
-  'https://*.stripe.com',
-  'https://bundle.js:*',
-  'ws://127.0.0.1:*/',
-]
-const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com']
-
-app.use(
-  helmet.contentSecurityPolicy({
+app.use(helmet())
+csp.extend(app, {
+  policy: {
     directives: {
-      defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
-      baseUri: ["'self'"],
-      fontSrc: ["'self'", ...fontSrcUrls],
-      scriptSrc: ["'self'", 'https:', 'http:', 'blob:', ...scriptSrcUrls],
-      frameSrc: ["'self'", 'https://js.stripe.com'],
-      objectSrc: ["'none'"],
-      styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
-      workerSrc: ["'self'", 'blob:', 'https://m.stripe.network'],
-      childSrc: ["'self'", 'blob:'],
-      imgSrc: ["'self'", 'blob:', 'data:', 'https:'],
-      formAction: ["'self'"],
-      connectSrc: ["'self'", "'unsafe-inline'", 'data:', 'blob:', ...connectSrcUrls],
-      upgradeInsecureRequests: [],
+      'default-src': ['self'],
+      'style-src': ['self', 'unsafe-inline', 'https:'],
+      'font-src': ['self', 'https://fonts.gstatic.com'],
+      'script-src': [
+        'self',
+        'unsafe-inline',
+        'data',
+        'blob',
+        'https://js.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:8828',
+        'ws://localhost:56558/',
+      ],
+      'worker-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'frame-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'img-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
+      'connect-src': [
+        'self',
+        'unsafe-inline',
+        'data:',
+        'blob:',
+        'wss://<HEROKU-SUBDOMAIN>.herokuapp.com:<PORT>/',
+        'https://*.stripe.com',
+        'https://*.mapbox.com',
+        'https://*.cloudflare.com/',
+        'https://bundle.js:*',
+        'ws://localhost:*/',
+      ],
     },
-  }),
-)
+  },
+})
 
 // Development logging
 if (process.env.NODE_ENV === 'development') {
@@ -111,6 +139,7 @@ app.use('/', viewRouter)
 app.use('/api/v1/tours', toursRouter)
 app.use('/api/v1/users', usersRouter)
 app.use('/api/v1/reviews', reviewsRouter)
+app.use('/api/v1/bookings', bookingsRouter)
 
 app.all('*', (req, res, next) => {
   next(new AppError(404, `Can't find ${req.originalUrl} resource! Please make sure the path is correct.`))
