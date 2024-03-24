@@ -3,6 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const Tour = require('../models/tour')
 const Booking = require('../models/booking')
 const catchAsync = require('../utils/catch-async')
+const { deleteOne, updateOne, createOne, getOne, getAll } = require('./handlerFactory')
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
@@ -53,3 +54,13 @@ exports.createBookingCheckout = catchAsync(async (req, res, next) => {
   await Booking.create({ tour, user, price })
   res.redirect(req.originalUrl.split('?')[0])
 })
+
+exports.getAllBookings = getAll(Booking)
+
+exports.getBooking = getOne(Booking)
+
+exports.createBooking = createOne(Booking)
+
+exports.updateBooking = updateOne(Booking)
+
+exports.deleteBooking = deleteOne(Booking)
