@@ -159,7 +159,7 @@ tourSchema.pre('save', function (next) {
   next()
 })
 
-// for embedding users to schema
+// Example for embedding users to schema
 // tourSchema.pre('save', async function (next) {
 //   const guidesPromises = this.guides.map(async (id) => await User.findById(id))
 //   this.guides = await Promise.all(guidesPromises)
@@ -193,10 +193,10 @@ tourSchema.pre(/^find/, function (next) {
   next()
 })
 
-tourSchema.post(/^find/, function (docs, next) {
-  console.log(`Tours query took ${Date.now() - this.start} ms`)
-  next()
-})
+// tourSchema.post(/^find/, function (docs, next) {
+//   console.log(`Tours query took ${Date.now() - this.start} ms`)
+//   next()
+// })
 
 // AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
