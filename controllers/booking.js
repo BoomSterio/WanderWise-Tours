@@ -1,7 +1,9 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 const Tour = require('../models/tour')
+const Booking = require('../models/booking')
 const catchAsync = require('../utils/catch-async')
+const { deleteOne, updateOne, createOne, getOne, getAll } = require('./handlerFactory')
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
@@ -10,7 +12,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 2) Create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${req.protocol}://${req.get('host')}/`,
+    // TODO: replace this unsecure method with Stripe Web Hooks to create a booking
+    success_url: `${req.protocol}://${req.get('host')}/?tour=${req.params.tourId}&user=${req.user.id}&price=${
+      tour.price
+    }`,
     cancel_url: `${req.protocol}://${req.get('host')}/tour/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
@@ -37,3 +42,25 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     session,
   })
 })
+
+exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+  // TODO: change this temporary workaround, because IT'S UNSECURE
+  const { tour, user, price } = req.query
+
+  if (!tour || !user || !price) {
+    return next()
+  }
+
+  await Booking.create({ tour, user, price })
+  res.redirect(req.originalUrl.split('?')[0])
+})
+
+exports.getAllBookings = getAll(Booking)
+
+exports.getBooking = getOne(Booking)
+
+exports.createBooking = createOne(Booking)
+
+exports.updateBooking = updateOne(Booking)
+
+exports.deleteBooking = deleteOne(Booking)
