@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize')
 const xss = require('xss-clean')
 const cookieParser = require('cookie-parser')
 const csp = require('express-csp')
+const compression = require('compression')
 
 const AppError = require('./utils/app-error')
 
@@ -127,6 +128,9 @@ app.use(mongoSanitize())
 
 // Data sanitization against XSS attacks
 app.use(xss())
+
+// Compressing all the text sent to clients
+app.use(compression())
 
 // Test middleware for showcase
 app.use((req, res, next) => {
