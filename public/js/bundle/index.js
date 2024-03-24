@@ -3009,7 +3009,7 @@ const login = async ({ email, password })=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "POST",
-            url: `http://127.0.0.1:8080/api/v1/users/login`,
+            url: "/api/v1/users/login",
             data: {
                 email,
                 password
@@ -3029,7 +3029,7 @@ const signup = async ({ name, email, password, passwordConfirm })=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "POST",
-            url: `http://127.0.0.1:8080/api/v1/users/signup`,
+            url: "/api/v1/users/signup",
             data: {
                 name,
                 email,
@@ -3051,7 +3051,7 @@ const logout = async ()=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "GET",
-            url: `http://127.0.0.1:8080/api/v1/users/logout`
+            url: "/api/v1/users/logout"
         });
         if (res.data.status === "success") {
             (0, _alerts.showAlert)("success", "Logged out successfully!");
@@ -7468,7 +7468,7 @@ const updateMyGeneralData = async (values)=>{
     try {
         const res = await (0, _axiosDefault.default)({
             method: "PATCH",
-            url: `http://127.0.0.1:8080/api/v1/users/update-me`,
+            url: `/api/v1/users/update-me`,
             data: values
         });
         if (res.data.status === "success") {
@@ -7485,7 +7485,7 @@ const updateMyPassword = async ({ passwordCurrent, password, passwordConfirm })=
     try {
         const res = await (0, _axiosDefault.default)({
             method: "PATCH",
-            url: `http://127.0.0.1:8080/api/v1/users/update-my-password`,
+            url: `/api/v1/users/update-my-password`,
             data: {
                 passwordCurrent,
                 password,
@@ -7514,7 +7514,7 @@ const stripe = Stripe("pk_test_51OwqklCPf7BAtHGEGfQuvznxYOAosNfDgtyqjUh1hYOj9nu7
 const bookTour = async (tourId)=>{
     try {
         // 1) Get checkout session from API
-        const { data: { session } } = await (0, _axiosDefault.default)(`http://127.0.0.1:8080/api/v1/bookings/checkout-session/${tourId}`);
+        const { data: { session } } = await (0, _axiosDefault.default)(`/api/v1/bookings/checkout-session/${tourId}`);
         await stripe.redirectToCheckout({
             sessionId: session.id
         });
@@ -7522,98 +7522,7 @@ const bookTour = async (tourId)=>{
         (0, _alerts.showAlert)("error", `Could not book tour: ${err.response.data.message}`);
     }
 // 2) Display checkout form and charge credit card information}
-} // // The items the customer wants to buy
- // const items = [{ id: 'xl-tshirt' }]
- // let elements
- // // ------- UI helpers -------
- // function showMessage(messageText) {
- //   const messageContainer = document.querySelector('#payment-message')
- //   messageContainer.classList.remove('hidden')
- //   messageContainer.textContent = messageText
- //   setTimeout(() => {
- //     messageContainer.classList.add('hidden')
- //     messageContainer.textContent = ''
- //   }, 4000)
- // }
- // // Show a spinner on payment submission
- // function setLoading(isLoading) {
- //   if (isLoading) {
- //     // Disable the button and show a spinner
- //     document.querySelector('#submit').disabled = true
- //     document.querySelector('#spinner').classList.remove('hidden')
- //     document.querySelector('#button-text').classList.add('hidden')
- //   } else {
- //     document.querySelector('#submit').disabled = false
- //     document.querySelector('#spinner').classList.add('hidden')
- //     document.querySelector('#button-text').classList.remove('hidden')
- //   }
- // }
- // // Fetches a payment intent and captures the client secret
- // async function initialize() {
- //   const response = await fetch('/create-payment-intent', {
- //     method: 'POST',
- //     headers: { 'Content-Type': 'application/json' },
- //     body: JSON.stringify({ items }),
- //   })
- //   const { clientSecret } = await response.json()
- //   const appearance = {
- //     theme: 'stripe',
- //   }
- //   elements = stripe.elements({ appearance, clientSecret })
- //   const paymentElementOptions = {
- //     layout: 'tabs',
- //   }
- //   const paymentElement = elements.create('payment', paymentElementOptions)
- //   paymentElement.mount('#payment-element')
- // }
- // async function handleSubmit(e) {
- //   e.preventDefault()
- //   setLoading(true)
- //   const { error } = await stripe.confirmPayment({
- //     elements,
- //     confirmParams: {
- //       // Make sure to change this to your payment completion page
- //       return_url: 'http://localhost:4242/checkout.html',
- //     },
- //   })
- //   // This point will only be reached if there is an immediate error when
- //   // confirming the payment. Otherwise, your customer will be redirected to
- //   // your `return_url`. For some payment methods like iDEAL, your customer will
- //   // be redirected to an intermediate site first to authorize the payment, then
- //   // redirected to the `return_url`.
- //   if (error.type === 'card_error' || error.type === 'validation_error') {
- //     showMessage(error.message)
- //   } else {
- //     showMessage('An unexpected error occurred.')
- //   }
- //   setLoading(false)
- // }
- // document.querySelector('#payment-form').addEventListener('submit', handleSubmit)
- // // Fetches the payment intent status after payment submission
- // async function checkStatus() {
- //   const clientSecret = new URLSearchParams(window.location.search).get('payment_intent_client_secret')
- //   if (!clientSecret) {
- //     return
- //   }
- //   const { paymentIntent } = await stripe.retrievePaymentIntent(clientSecret)
- //   switch (paymentIntent.status) {
- //     case 'succeeded':
- //       showMessage('Payment succeeded!')
- //       break
- //     case 'processing':
- //       showMessage('Your payment is processing.')
- //       break
- //     case 'requires_payment_method':
- //       showMessage('Your payment was not successful, please try again.')
- //       break
- //     default:
- //       showMessage('Something went wrong.')
- //       break
- //   }
- // }
- // initialize()
- // checkStatus()
-;
+};
 
 },{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequirea36f")
 
