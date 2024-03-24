@@ -7615,6 +7615,6 @@ const bookTour = async (tourId)=>{
  // checkStatus()
 ;
 
-},{"axios":"7Dvix","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd","./alerts":"41C3R"}]},["g4K8O","360ah"], "360ah", "parcelRequire11c7")
+},{"axios":"7Dvix","./alerts":"41C3R","@parcel/transformer-js/src/esmodule-helpers.js":"7x1kd"}]},["g4K8O","360ah"], "360ah", "parcelRequirea36f")
 
 //# sourceMappingURL=index.js.map

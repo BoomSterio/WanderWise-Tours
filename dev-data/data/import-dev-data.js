@@ -50,12 +50,10 @@ const deleteAllData = async () => {
 
 if (process.argv.includes('--import')) {
   importData()
-  return
 }
 
 if (process.argv.includes('--delete')) {
   deleteAllData()
-  return
 }
 
 console.log('No argument reveived.\nUse either --import (to seed the db) or --delete (to delete all the data from db)')
