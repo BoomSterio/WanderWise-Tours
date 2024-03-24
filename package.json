@@ -5,6 +5,7 @@
     "node": "20.x",
     "npm": "10.x"
   },
+  "packageManager": "npm@10.2.4",
   "description": "Booking web application",
   "main": "app.js",
   "targets": {
