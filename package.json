@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "engines": {
     "node": ">=20.11.0 <21.2.0",
-    "npm": ">=8.19.0"
+    "npm": ">=10.0.0"
   },
-  "packageManager": "npm@8.19.0",
   "description": "Booking web application",
   "main": "app.js",
   "targets": {
@@ -25,13 +24,14 @@
   "author": "Maksym Sh",
   "license": "ISC",
   "dependencies": {
+    "@netlify/functions": "^2.6.0",
     "axios": "^1.6.7",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "core-js": "^3.36.0",
     "dotenv": "^16.3.1",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "express-csp": "^0.1.3",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^7.1.5",
@@ -45,6 +45,7 @@
     "nodemailer-brevo-transport": "^2.1.0",
     "pug": "^3.0.2",
     "regenerator-runtime": "^0.13.11",
+    "serverless-http": "^3.2.0",
     "sharp": "^0.33.3",
     "slugify": "^1.6.6",
     "stripe": "^14.21.0",

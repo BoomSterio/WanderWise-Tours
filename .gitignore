@@ -40,3 +40,6 @@ trash
 *.sublime-project
 *.sublime-workspace
 sftp-config.json
+
+# Local Netlify folder
+.netlify

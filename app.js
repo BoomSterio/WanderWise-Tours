@@ -8,6 +8,7 @@ const xss = require('xss-clean')
 const cookieParser = require('cookie-parser')
 const csp = require('express-csp')
 const compression = require('compression')
+const serverless = require('serverless-http')
 
 const AppError = require('./utils/app-error')
 
@@ -156,5 +157,7 @@ app.all('*', (req, res, next) => {
 // 3) Errors handling
 
 app.use(globalErrorHandler)
+
+export const handler = serverless(app)
 
 module.exports = app
