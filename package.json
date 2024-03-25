@@ -2,8 +2,8 @@
   "name": "wander-tours",
   "version": "1.0.0",
   "engines": {
-    "node": "20.x, v21.1.0",
-    "npm": "8.x, 10x"
+    "node": ">=20.11.0, <21.2.0",
+    "npm": ">=8.19.0"
   },
   "packageManager": "npm@10.2.4",
   "description": "Booking web application",
