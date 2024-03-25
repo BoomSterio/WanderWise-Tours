@@ -158,6 +158,6 @@ app.all('*', (req, res, next) => {
 
 app.use(globalErrorHandler)
 
-export const handler = serverless(app)
+exports.handler = serverless(app)
 
 module.exports = app
