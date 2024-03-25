@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "engines": {
     "node": "20.x",
-    "npm": "10.x"
+    "npm": "8.x"
   },
   "packageManager": "npm@10.2.4",
   "description": "Booking web application",
