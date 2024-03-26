@@ -22,6 +22,8 @@ const RATE_LIMIT_MINUTES = 60
 
 const app = express()
 
+app.enable('trust proxy')
+
 // Template engine set up
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, 'views'))
