@@ -8,10 +8,12 @@ const xss = require('xss-clean')
 const cookieParser = require('cookie-parser')
 const csp = require('express-csp')
 const compression = require('compression')
+const cors = require('cors')
 
 const AppError = require('./utils/app-error')
 
 const globalErrorHandler = require('./controllers/error')
+const { webhookCheckout } = require('./controllers/booking')
 const viewRouter = require('./routes/view')
 const toursRouter = require('./routes/tours')
 const usersRouter = require('./routes/users')
@@ -22,13 +24,20 @@ const RATE_LIMIT_MINUTES = 60
 
 const app = express()
 
-app.enable('trust proxy')
+//app.enable('trust proxy')
+
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
 
 // Template engine set up
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, 'views'))
 
 // 1) Global Middlewares
+
+// Implement CORS
+app.use(cors())
+
+app.options('*', cors())
 
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')))
