@@ -13,6 +13,7 @@ const cors = require('cors')
 const AppError = require('./utils/app-error')
 
 const globalErrorHandler = require('./controllers/error')
+const { webhookCheckout } = require('./controllers/booking')
 const viewRouter = require('./routes/view')
 const toursRouter = require('./routes/tours')
 const usersRouter = require('./routes/users')
@@ -23,7 +24,9 @@ const RATE_LIMIT_MINUTES = 60
 
 const app = express()
 
-app.enable('trust proxy')
+//app.enable('trust proxy')
+
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
 
 // Template engine set up
 app.set('view engine', 'pug')
