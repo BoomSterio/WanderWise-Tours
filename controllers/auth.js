@@ -10,17 +10,16 @@ const Email = require('../utils/email')
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN })
 
-const createAndSendToken = (user, statusCode, res) => {
+const createAndSendToken = (user, statusCode, req, res) => {
   const token = signToken(user._id)
 
-  const cookieOptions = {
+  res.cookie('jwt', token, {
     expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
     httpOnly: true,
-  }
-  // secure option will only allow sending cookie through HTTPS
-  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true
 
-  res.cookie('jwt', token, cookieOptions)
+    // secure option will only allow sending cookie through HTTPS
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+  })
 
   // Remove the password from output
   user.password = undefined
@@ -41,7 +40,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   const url = `${req.protocol}://${req.get('host')}/me`
   await new Email(user, url).sendWelcome()
 
-  createAndSendToken(user, 201, res)
+  createAndSendToken(user, 201, req, res)
 })
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -61,7 +60,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything ok, send token to client
-  createAndSendToken(user, 200, res)
+  createAndSendToken(user, 200, req, res)
 })
 
 exports.logout = catchAsync(async (req, res) => {
@@ -202,7 +201,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update passwordChangedAt for the user
 
   // 4) Log the user in (send JWT)
-  createAndSendToken(user, 200, res)
+  createAndSendToken(user, 200, req, res)
 })
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
@@ -222,5 +221,5 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // User.findByIdAndUpdate would NOT trigger middlewares and passwordConfirm validator! That's why we use .save()
 
   // 4) Log user in (send JWT)
-  createAndSendToken(user, 200, res)
+  createAndSendToken(user, 200, req, res)
 })
